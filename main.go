@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -14,28 +16,44 @@ func main() {
 		panic("Cannot connect to DB")
 	}
 	DB.AutoMigrate(&User{})
-	// //ini create
-	// user := User{
-	// 	FirstName: "senaa",
-	// 	LastName:  "pahlevii",
-	// 	Email:     "senapahlevi1@gmail.com",
+	//quering these comment immediately after succes input 3 data into postgresql
+	// users := []User{
+	// 	{
+	// 		FirstName: "Sena",
+	// 		LastName:  "Pahlevi",
+	// 		Email:     "senapahlevi@gmail.com",
+	// 	},
+	// 	{
+	// 		FirstName: "Xenna",
+	// 		LastName:  "Smith",
+	// 		Email:     "xennasmith@gmail.com",
+	// 	},
+	// 	{
+	// 		FirstName: "William",
+	// 		LastName:  "Blake",
+	// 		Email:     "williamblake@gmail.com",
+	// 	},
 	// }
-	// DB.Create(&user)
-
-	// //update first comment above we not gonna create user again just updates and deletes
-	// user := User{
-	// 	Id:        1,
-	// 	FirstName: "xenna",
-	// 	LastName:  "levi",
-	// 	Email:     "xenna@gmail.com",
+	// //these assign above 3 datas
+	// for _, user := range users { //these using underscore(_) if didnt want to use variable because on docs
+	// 	//for range always using variables to avoid error coz golang is type programming language (Strict not like .js)
+	// 	DB.Create(&user)
 	// }
-	// DB.Updates(&user) //pass user to params (&user)
 
-	//deletes only find the id so the data will deletes immediately comment above update and create
-	user := User{
-		Id: 1,
-	}
-	DB.Delete(&user)
+	//query look like filter (first,last,where(similiarity like filters))
+	user := User{} //these var user will assign and to printout like .push() create new array zero to got output
+	//first() showing first datas
+	// DB.First(&user) //always passing &user coz to asssign into var user
+	// fmt.Println(user)
+
+	//last showing last data
+	// DB.Last(&user) //always passing &user coz to asssign into var user
+	// fmt.Println(user)
+
+	//query filter using where
+	DB.Where("last_name", "Smith").First(&user) //why last_name not Lastname like these struct? coz it point out the column postgress last_name
+	fmt.Println(user)
+
 }
 
 type User struct {
