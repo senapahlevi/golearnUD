@@ -1,46 +1,31 @@
 package main
 
 import (
-	"errors"
-	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+func main() {
+	const DNS = "host=127.0.0.1 user=postgres password=123456789 dbname=goudemy port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+
+	DB, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})
+	if err != nil {
+		// fmt.Println(err.Error())
+		panic("Cannot connect to DB")
+	}
+	DB.AutoMigrate(&User{})
+	//ini create
+	user := User{
+		FirstName: "senaa",
+		LastName:  "pahlevii",
+		Email:     "senapahlevi1@gmail.com",
+	}
+	DB.Create(&user)
+}
+
 type User struct {
-	ID        int
+	Id        int
 	FirstName string
 	LastName  string
-	Addrr     Address
-}
-
-type Address struct {
-	Country string
-	City    string
-}
-
-func main() {
-	hasilAdd := Address{
-		Country: "germany",
-		City:    "Berlin",
-	}
-	user := User{
-		ID:        1,
-		FirstName: "First",
-		LastName:  "lassst",
-		Addrr:     hasilAdd,
-	}
-	fmt.Println(user)
-	//function
-	// result, err := Divide(4, 0)
-	result, zzz := Divide(4, 0)
-	if zzz != nil {
-		fmt.Println(zzz)
-	}
-	fmt.Println(result)
-}
-
-func Divide(a int, b int) (int, error) {
-	if b == 0 {
-		return 0, errors.New("cannot divide with zero !!!!!")
-	}
-	return a / b, nil
+	Email     string
 }
