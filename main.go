@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,17 +16,13 @@ func main() {
 	DB.AutoMigrate(&User{})
 
 	// gorm.Model
-	user := User{
-		Model: gorm.Model{
-			CreatedAt: time.Now(),
-		},
-	}
-	fmt.Println(user)
+
 }
 
+//constraints like laravels length text,unique not same like others, etc
 type User struct {
-	gorm.Model //so these gorm model will automatically add Id, delete/update At
-	FirstName  string
-	LastName   string
-	Email      string
+	gorm.Model        //so these gorm model will automatically add Id, delete/update At
+	FirstName  string `gorm:"type:VARCHAR(30)"`
+	LastName   string `gorm:"size:100"`
+	Email      string `gorm:"unique"`
 }
