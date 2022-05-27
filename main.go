@@ -2,12 +2,28 @@ package main
 
 import "fmt"
 
+type User struct {
+	ID        int
+	FirstName string
+	LastName  string
+	Addrr     Address
+}
+
+type Address struct {
+	Country string
+	City    string
+}
+
 func main() {
-	m := map[string]int{"key": 5}
-	// fmt.Println(m)
-	m["key"] = 10 //ini add/nambah stack
-	// fmt.Println(m)
-	delete(m, "key") //ini delete dan delete dari awal array
-	m["newsss"] = 2  //ini juga add key
-	fmt.Println(m)
+	hasilAdd := Address{
+		Country: "germany",
+		City:    "Berlin",
+	}
+	user := User{
+		ID:        1,
+		FirstName: "First",
+		LastName:  "lassst",
+		Addrr:     hasilAdd,
+	}
+	fmt.Println(user)
 }
