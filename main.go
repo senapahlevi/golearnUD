@@ -14,13 +14,28 @@ func main() {
 		panic("Cannot connect to DB")
 	}
 	DB.AutoMigrate(&User{})
-	//ini create
+	// //ini create
+	// user := User{
+	// 	FirstName: "senaa",
+	// 	LastName:  "pahlevii",
+	// 	Email:     "senapahlevi1@gmail.com",
+	// }
+	// DB.Create(&user)
+
+	// //update first comment above we not gonna create user again just updates and deletes
+	// user := User{
+	// 	Id:        1,
+	// 	FirstName: "xenna",
+	// 	LastName:  "levi",
+	// 	Email:     "xenna@gmail.com",
+	// }
+	// DB.Updates(&user) //pass user to params (&user)
+
+	//deletes only find the id so the data will deletes immediately comment above update and create
 	user := User{
-		FirstName: "senaa",
-		LastName:  "pahlevii",
-		Email:     "senapahlevi1@gmail.com",
+		Id: 1,
 	}
-	DB.Create(&user)
+	DB.Delete(&user)
 }
 
 type User struct {
