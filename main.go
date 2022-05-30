@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	"fmt"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,17 +17,22 @@ func main() {
 	}
 	// DB.AutoMigrate(&User{})
 	//these used to drop and migrate like migrate:refresh laravel
-	DB.Migrator().DropTable(&User{})
-	DB.Migrator().CreateTable(&User{})
+	DB.Migrator().DropTable(&User{}, &Address{})
+	DB.Migrator().CreateTable(&User{}, &Address{})
 	// gorm.Model
 	//test buat nullstring(sql.nullable) bukan nullable
 	user := User{
-		Email: sql.NullString{
-			String: "example@gmail.com",
-			Valid:  true, //true itu biar ga error
+		FirstName: "sena",
+		LastName:  "pahlevvvvv",
+		Email:     "senapahlevi2@gmail.com",
+		Address: Address{
+			Name: "Main str.",
 		},
 	}
 	DB.Create(&user)
+	u := User{}
+	DB.Preload("Address").First(&u)
+	fmt.Println(u)
 }
 
 //nullable string but when using these db will continue migrate/save/update data with empty
@@ -40,8 +45,16 @@ func main() {
 
 //using sql.NullString when condition null/not null will gives warning or like handling errors so the data will not save with empty data
 type User struct {
-	gorm.Model                //so these gorm model will automatically add Id, delete/update At
-	FirstName  sql.NullString `gorm:"type:VARCHAR(30); null;"`
-	LastName   sql.NullString `gorm:"size:100; default:'Smith weberjenkinson'"`
-	Email      sql.NullString `gorm:"unique; not null;"`
+	gorm.Model //so these gorm model will automatically add Id, delete/update At
+	// ID        uint
+	FirstName string  `gorm:"type:VARCHAR(30); null;"`
+	LastName  string  `gorm:"size:100; default:'Smith weberjenkinson'"`
+	Email     string  `gorm:"unique; not null;"`
+	Address   Address `gorm:"foreignKey:UserId"`
+}
+type Address struct {
+	gorm.Model //so these gorm model will automatically add Id, delete/update At
+	// ID     uint
+	UserId uint
+	Name   string
 }
