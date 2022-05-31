@@ -1,7 +1,8 @@
 package controllers
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
+// func Other(c *fiber.Ctx) {
 func Other(c *fiber.Ctx) {
-	c.SendString("hello from otherss")
+	// return c.SendString("hello from otherss")
 }
