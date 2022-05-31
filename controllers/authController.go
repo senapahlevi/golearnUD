@@ -3,8 +3,11 @@ package controllers
 import (
 	"goudemy/database"
 	"goudemy/models"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -49,20 +52,23 @@ func Register(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	var data map[string]string //[key]value 2 2 nya string buat input nya
+	//[key]value 2 2 nya string buat input nya
+	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
+
 	var user models.User
 	//conditional coz login only input email and password
 	//conditionla email
 	database.DB.Where("email = ?", data["email"]).First(&user)
 	//when user not found
+
 	if user.Id == 0 {
 		c.Status(404)
 		return c.JSON(fiber.Map{
-			"message": "upps email user not found",
+			"message": "not found",
 		})
 	}
 	//compare password input with stored password
@@ -72,5 +78,31 @@ func Login(c *fiber.Ctx) error {
 			"message": "incorrect password",
 		})
 	}
-	return c.JSON(user)
+	//jwt jadi ketika di postman response nya itu ya berupa token bukan nama,email,pass, bahaya uy
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{ //coz jwt.standardclaims deprecated HS256
+		// 	//buat login and issuer allow user found on db and strconv itoa convert int to string default
+		Issuer:    strconv.Itoa(int(user.Id)),
+		ExpiresAt: time.Now().Add(5 * time.Hour).Unix(), //for 1 day expires
+	})
+	token, err := claims.SignedString([]byte("secret")) //ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
+
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+		// return c.SendString("jancuk")
+
+	}
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+	}
+	c.Cookie(&cookie)
+
+	// return c.JSON(user) //please dont use these coz return what user type email and pass
+
+	// return c.JSON(token)
+	return c.JSON(fiber.Map{
+		"message": "success",
+	})
 }
