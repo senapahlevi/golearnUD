@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"goudemy/database"
 	"goudemy/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -42,5 +43,34 @@ func Register(c *fiber.Ctx) error {
 	// user.LastName = "pahlevi"
 
 	// return c.JSON(user)
+	//store to db after input post api/register
+	database.DB.Create(&user)
+	return c.JSON(user)
+}
+
+func Login(c *fiber.Ctx) error {
+	var data map[string]string //[key]value 2 2 nya string buat input nya
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+	var user models.User
+	//conditional coz login only input email and password
+	//conditionla email
+	database.DB.Where("email = ?", data["email"]).First(&user)
+	//when user not found
+	if user.Id == 0 {
+		c.Status(404)
+		return c.JSON(fiber.Map{
+			"message": "upps email user not found",
+		})
+	}
+	//compare password input with stored password
+	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
+		c.Status(400)
+		return c.JSON(fiber.Map{
+			"message": "incorrect password",
+		})
+	}
 	return c.JSON(user)
 }
