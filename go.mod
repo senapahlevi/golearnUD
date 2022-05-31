@@ -3,8 +3,13 @@ module goudemy
 go 1.18
 
 require (
+	github.com/gofiber/fiber v1.14.6
+	gorm.io/driver/postgres v1.3.6
+	gorm.io/gorm v1.23.5
+)
+
+require (
 	github.com/andybalholm/brotli v1.0.0 // indirect
-	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -27,6 +32,4 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gorm.io/driver/postgres v1.3.6 // indirect
-	gorm.io/gorm v1.23.5 // indirect
 )
