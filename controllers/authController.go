@@ -106,3 +106,44 @@ func Login(c *fiber.Ctx) error {
 		"message": "success",
 	})
 }
+
+type Claims struct {
+	jwt.StandardClaims //ini klik isin ya  ada audience,expires,dll
+}
+
+func User(c *fiber.Ctx) error {
+	cookie := c.Cookies("jwt") //get cookies dulu
+	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil
+	})
+	if err != nil || !token.Valid { //and or err and token is invalid
+		//not authenticated
+		c.Status(fiber.StatusUnauthorized)
+		return c.JSON(fiber.Map{
+			"message": "unauthenticated !!",
+		})
+	}
+	// claims := token.Claims //ini isi nya iss (issuer) misal 3 = ini id data user id-3 bukan yg lain ya
+	// return c.JSON(claims) //cukup sampe sini udah sesuai  dibawah ini opsional
+
+	/////these opsional ga wajib
+	//if mau nampilin iss aja dan nampilin isi si issuer (iss) komen dulu yak claims dan return nya
+	var user models.User
+	claims := token.Claims.(*Claims)
+	database.DB.Where("id=?", claims.Issuer).First(&user)
+	return c.JSON(user)
+
+}
+
+func Logout(c *fiber.Ctx) error {
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",                         //no value for logout
+		Expires:  time.Now().Add(-time.Hour), //these using minus because using past/ instant expires to  logout
+		HTTPOnly: true,
+	}
+	c.Cookie(&cookie)
+	return c.JSON(fiber.Map{
+		"message": "success logout",
+	})
+}
