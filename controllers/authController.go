@@ -3,11 +3,11 @@ package controllers
 import (
 	"goudemy/database"
 	"goudemy/models"
+	"goudemy/util"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -78,14 +78,21 @@ func Login(c *fiber.Ctx) error {
 			"message": "incorrect password",
 		})
 	}
-	//jwt jadi ketika di postman response nya itu ya berupa token bukan nama,email,pass, bahaya uy
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{ //coz jwt.standardclaims deprecated HS256
-		// 	//buat login and issuer allow user found on db and strconv itoa convert int to string default
-		Issuer:    strconv.Itoa(int(user.Id)),
-		ExpiresAt: time.Now().Add(5 * time.Hour).Unix(), //for 1 day expires
-	})
-	token, err := claims.SignedString([]byte("secret")) //ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
 
+	//jwt jadi ketika di postman response nya itu ya berupa token bukan nama,email,pass, bahaya uy
+	///here below is generate jwt so these example if not using middleware were use these over and over to auth user generate jwt
+	// claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{ //coz jwt.standardclaims deprecated HS256
+	// 	// 	//buat login and issuer allow user found on db and strconv itoa convert int to string default
+	// 	Issuer:    strconv.Itoa(int(user.Id)),
+	// 	ExpiresAt: time.Now().Add(5 * time.Hour).Unix(), //for 1 day expires
+	// })
+	// token, err := claims.SignedString([]byte("secret")) //ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
+
+	///until up here
+
+	//using middleware
+
+	token, err := util.GenerateJwt(strconv.Itoa((int(user.Id)))) //ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 		// return c.SendString("jancuk")
@@ -107,30 +114,45 @@ func Login(c *fiber.Ctx) error {
 	})
 }
 
-type Claims struct {
-	jwt.StandardClaims //ini klik isin ya  ada audience,expires,dll
-}
+// without middlewares
+// type Claims struct {
+// 	jwt.StandardClaims //ini klik isi ya  ada audience,expires,dll
+// }
+//with middleware not using claims struct just jwt.StandardClaims
 
 func User(c *fiber.Ctx) error {
 	cookie := c.Cookies("jwt") //get cookies dulu
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
-	})
-	if err != nil || !token.Valid { //and or err and token is invalid
-		//not authenticated
-		c.Status(fiber.StatusUnauthorized)
-		return c.JSON(fiber.Map{
-			"message": "unauthenticated !!",
-		})
-	}
+	////below  theese for parse without middleware and slicing util
+	// token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte("secret"), nil
+	// })
+	//up here
+	//with middleware and util slicing
+	id, _ := util.ParseJwt(cookie)
+
+	//without middleware below here
+	// if err != nil || !token.Valid { //and or err and token is invalid
+	// 	//not authenticated
+	// 	c.Status(fiber.StatusUnauthorized)
+	// 	return c.JSON(fiber.Map{
+	// 		"message": "unauthenticated !!",
+	// 	})
+	// }
+	//up here
+
 	// claims := token.Claims //ini isi nya iss (issuer) misal 3 = ini id data user id-3 bukan yg lain ya
 	// return c.JSON(claims) //cukup sampe sini udah sesuai  dibawah ini opsional
 
 	/////these opsional ga wajib
 	//if mau nampilin iss aja dan nampilin isi si issuer (iss) komen dulu yak claims dan return nya
 	var user models.User
-	claims := token.Claims.(*Claims)
-	database.DB.Where("id=?", claims.Issuer).First(&user)
+	//without middleware
+	// claims := token.Claims.(*Claims)
+	//without middleware
+	// database.DB.Where("id=?", claims.Issuer).First(&user)
+
+	//with using middleware
+	database.DB.Where("id=?", id).First(&user)
 	return c.JSON(user)
 
 }
