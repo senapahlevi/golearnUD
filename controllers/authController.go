@@ -75,7 +75,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	//compare password input with stored password
 	// if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil { //oops weare used reusable from func ComparePassword()
-	if err := user.ComparePassword(data["password"]); err != nil {
+	if err := user.ComparePassword(data["password "]); err != nil {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "incorrect password",
