@@ -12,7 +12,8 @@ import (
 func AllUsers(c *fiber.Ctx) error {
 	var users []models.User
 
-	database.DB.Find(&users)
+	// database.DB.Find(&users)
+	database.DB.Preload("Role").Find(&users)
 	return c.JSON(users)
 }
 
@@ -34,7 +35,8 @@ func GetUser(c *fiber.Ctx) error {
 	user := models.User{
 		Id: uint(id),
 	}
-	database.DB.Find(&user) //find user ex user/4 , user/3
+	// database.DB.Find(&user) //find user ex user/4 , user/3
+	database.DB.Preload("Role").Find(&user) //find user ex user/4 , user/3 oreload to find roles query before user
 	return c.JSON(user)
 }
 

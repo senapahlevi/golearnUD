@@ -9,6 +9,8 @@ type User struct {
 	Email     string `json:"email" gorm:"unique"`
 	// Password  string
 	Password []byte `json:"-"` //- is not showing output after user regis/login in json using these coz password on Register func authController avoid error if using string coz using hash
+	RoleId   uint   `json:"role_id"`
+	Role     Role   `json:"role" gorm:"foreignKey:RoleId"`
 }
 
 //so in here set and compare func are slicing to reusable just call these func not type over and over again(painfuls)

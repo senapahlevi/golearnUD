@@ -39,6 +39,7 @@ func Register(c *fiber.Ctx) error {
 		FirstName: data["first_name"],
 		LastName:  data["last_name"],
 		Email:     data["email"],
+		RoleId:    1, //default nya example ceritanya when user regist default admin
 		// Password:  data["password"],
 		// Password: password, //opps weare not used anymore coz userController setPassword func reusable broo
 	}
