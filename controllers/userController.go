@@ -5,7 +5,6 @@ import (
 	"goudemy/models"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 //these we will create user but a bit different not like func Register
@@ -22,8 +21,9 @@ func CreateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(&user); err != nil {
 		return err
 	}
-	password, _ := bcrypt.GenerateFromPassword([]byte("1234"), 14)
-	user.Password = password
+	// password, _ := bcrypt.GenerateFromPassword([]byte("1234"), 14) //not reusable
+	user.SetPassword("1234") //reusable broo
+	// user.Password = password not used coz reusable
 	database.DB.Create(&user)
 	return c.JSON(user)
 }

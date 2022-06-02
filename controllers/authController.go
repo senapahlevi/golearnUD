@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 // func Hello(c *fiber.Ctx) {
@@ -32,7 +30,9 @@ func Register(c *fiber.Ctx) error {
 
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+	// password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14) //we are just call ond userController funcSETPASSWORD
+	// here
+
 	//ada 2 cara masukkin nama/value ke struct nya
 	user := models.User{
 		// FirstName: "sena",
@@ -40,9 +40,11 @@ func Register(c *fiber.Ctx) error {
 		LastName:  data["last_name"],
 		Email:     data["email"],
 		// Password:  data["password"],
-		Password: password,
+		// Password: password, //opps weare not used anymore coz userController setPassword func reusable broo
 	}
-	//no 2 simple
+	//here reusable set password
+	user.SetPassword(data["password"])
+	//no 2 simpleda
 	// user.LastName = "pahlevi"
 
 	// return c.JSON(user)
@@ -72,7 +74,8 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 	//compare password input with stored password
-	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
+	// if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil { //oops weare used reusable from func ComparePassword()
+	if err := user.ComparePassword(data["password"]); err != nil {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "incorrect password",
