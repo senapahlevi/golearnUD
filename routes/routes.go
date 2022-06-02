@@ -23,6 +23,14 @@ func Setup(app *fiber.App) {
 	app.Put("/api/users/:id", controllers.UpdateUser)
 	app.Delete("/api/users/:id", controllers.DeleteUser)
 
+	//roles
+	app.Get("/api/roles", controllers.AllRoles)
+	app.Post("/api/roles", controllers.CreateRole)
+
+	app.Get("/api/role/:id", controllers.GetRole)
+	app.Put("/api/role/:id", controllers.UpdateRole)
+	app.Delete("/api/role/:id", controllers.DeleteRole)
+
 	// app.Get("/other", controllers.Other)
 } //biar bisa kepanggil dan no error antar package make huruf capital
 
