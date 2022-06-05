@@ -13,12 +13,8 @@ func Setup(app *fiber.App) {
 	app.Post("/api/login", controllers.Login)
 
 	app.Use(middlewares.IsAuthenticated)
-	app.Get("/api/user", controllers.User)
-	app.Post("/api/logout", controllers.Logout)
-
 	app.Get("/api/users", controllers.AllUsers)
 	app.Post("/api/users", controllers.CreateUser)
-
 	app.Get("/api/users/:id", controllers.GetUser)
 	app.Put("/api/users/:id", controllers.UpdateUser)
 	app.Delete("/api/users/:id", controllers.DeleteUser)
@@ -26,10 +22,12 @@ func Setup(app *fiber.App) {
 	//roles
 	app.Get("/api/roles", controllers.AllRoles)
 	app.Post("/api/roles", controllers.CreateRole)
+	app.Get("/api/roles/:id", controllers.GetRole)
+	app.Put("/api/roles/:id", controllers.UpdateRole)
+	app.Delete("/api/roles/:id", controllers.DeleteRole)
 
-	app.Get("/api/role/:id", controllers.GetRole)
-	app.Put("/api/role/:id", controllers.UpdateRole)
-	app.Delete("/api/role/:id", controllers.DeleteRole)
+	//permission
+	app.Get("/api/permissions", controllers.AllPermissions)
 
 	// app.Get("/other", controllers.Other)
 } //biar bisa kepanggil dan no error antar package make huruf capital
