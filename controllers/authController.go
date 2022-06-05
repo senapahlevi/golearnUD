@@ -76,7 +76,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	//compare password input with stored password
 	// if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil { //oops weare used reusable from func ComparePassword()
-	if err := user.ComparePassword(data["password "]); err != nil {
+	if err := user.ComparePassword(data["password"]); err != nil {
 		c.Status(400)
 		return c.JSON(fiber.Map{
 			"message": "incorrect password",
@@ -96,12 +96,13 @@ func Login(c *fiber.Ctx) error {
 
 	//using middleware
 
-	token, err := util.GenerateJwt(strconv.Itoa((int(user.Id)))) //ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
+	//ini wajib make secret (bebeas supaya hacker tidak gampang tau isi token nya)
+	token, err := util.GenerateJwt(strconv.Itoa(int(user.Id)))
+
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
-		// return c.SendString("jancuk")
-
 	}
+
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    token,
