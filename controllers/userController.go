@@ -3,6 +3,7 @@ package controllers
 import (
 	"goudemy/database"
 	"goudemy/models"
+	"math"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,11 +11,27 @@ import (
 
 //these we will create user but a bit different not like func Register
 func AllUsers(c *fiber.Ctx) error {
+	//add pagination
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit := 5
+	offset := (page - 1) * limit //where to start page from limit = ex: 5 and when we want to next page page-1
 	var users []models.User
-
+	var total int64
 	// database.DB.Find(&users)
-	database.DB.Preload("Role").Find(&users)
-	return c.JSON(users)
+	// database.DB.Preload("Role").Find(&users)
+
+	// return c.JSON(users) //only return users
+
+	database.DB.Preload("Role").Offset(offset).Limit(limit).Find(&users) //we want to showing roles , get query for counts
+	database.DB.Model(&models.User{}).Count(&total)                      //
+	return c.JSON(fiber.Map{                                             //we want to return page showing page=3 example
+		"data": users,
+		"meta": fiber.Map{
+			"page":      page,
+			"total":     total,
+			"last_page": math.Ceil(float64(int(total) / limit)),
+		},
+	})
 }
 
 func CreateUser(c *fiber.Ctx) error {
